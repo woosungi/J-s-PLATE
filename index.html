@@ -218,7 +218,7 @@ body {
 <body>
 <div class="app">
 <div class="hdr">
-  <div class="hdr-logo">🍝 J's PLATE</div>
+  <div class="hdr-logo">🍝 EagerTing</div>
   <button class="hdr-wallet" onclick="goWallet()">🎫 쿠폰 <span class="w-badge" id="wBadge">0</span></button>
 </div>
 
@@ -227,8 +227,8 @@ body {
   <div class="inner">
     <div class="store-badge">📍 J's PLATE — 파스타 &amp; 피자</div>
     <span class="home-icon">🍝</span>
-    <div class="home-title">J's PLATE</div>
-    <div class="home-eng">제이스 플레이트 · 웨이팅이 설레는 시간으로</div>
+    <div class="home-title">EagerTing</div>
+    <div class="home-eng">이거팅 · 웨이팅이 설레는 시간으로</div>
     <div class="home-box">기다리는 시간을 즐기는 시간으로 💛<br>밸런스 게임으로 나의 입맛 유형을 발견하고<br>맞춤 추천 메뉴와 쿠폰을 받아보세요!</div>
     <div class="home-btns">
       <button class="btn-y" onclick="showPage('party')">⚡ 웨이팅 즐기기 시작</button>
@@ -442,7 +442,7 @@ body {
       <div style="font-size:12px;color:var(--primary);letter-spacing:3px;font-weight:800;margin-bottom:4px;" id="sMbtiType">KURI</div>
       <div style="font-size:20px;font-weight:900;margin-bottom:6px;" id="sMbtiName">크림 정복자</div>
       <div style="font-size:13px;color:var(--text-muted);" id="sMbtiDesc">설명</div>
-      <div style="margin-top:14px;font-size:11px;color:var(--text-muted);">🍝 J's PLATE</div>
+      <div style="margin-top:14px;font-size:11px;color:var(--text-muted);">⚡ EagerTing | J's PLATE</div>
     </div>
     <div class="share-opts">
       <div class="s-opt" onclick="copyLink()"><div class="s-opt-ico" style="background:var(--bg3);">🔗</div><div class="s-opt-lbl">링크 복사</div></div>
@@ -670,27 +670,38 @@ function initRoulette(){
 function drawWheel(angle){
   const canvas=document.getElementById('rouCanvas');
   const ctx=canvas.getContext('2d');
+  const size=300, dpr=window.devicePixelRatio||1;
+  if(canvas.width!==size*dpr){
+    canvas.width=size*dpr; canvas.height=size*dpr;
+    canvas.style.width=size+'px'; canvas.style.height=size+'px';
+  }
+  ctx.setTransform(dpr,0,0,dpr,0,0);
   const cx=150,cy=150,r=147;
-  ctx.clearRect(0,0,300,300);
+  ctx.clearRect(0,0,size,size);
   const n=REWARDS.length,arc=(Math.PI*2)/n;
   REWARDS.forEach((rw,i)=>{
-    const s=angle+i*arc,e=s+arc;
+    const s=angle+i*arc,e=s+arc,mid=s+arc/2;
     ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,s,e);ctx.closePath();
     ctx.fillStyle=rw.color;ctx.fill();
     ctx.strokeStyle='rgba(0,0,0,.18)';ctx.lineWidth=2;ctx.stroke();
-    ctx.save();ctx.translate(cx,cy);ctx.rotate(s+arc/2);
+    ctx.save();
+    ctx.translate(cx,cy);
+    // 조각 중앙이 화면 아래쪽(글자가 뒤집힐 위치)이면 180도 보정해 똑바로 읽히게
+    const norm=((mid%(Math.PI*2))+Math.PI*2)%(Math.PI*2);
+    const flip = norm>0 && norm<Math.PI;
+    ctx.rotate(mid + (flip?Math.PI:0));
     ctx.textBaseline='middle';ctx.textAlign='center';
-    const lx=r*0.62;
-    ctx.font='16px serif';ctx.fillText(rw.emoji,lx,-9);
-    ctx.font='bold 8.5px Apple SD Gothic Neo,sans-serif';
-    ctx.fillStyle='rgba(0,0,0,.85)';ctx.fillText(rw.name,lx,9,82);
+    const lx=(flip?-1:1)*r*0.6;
+    ctx.font='17px serif';ctx.fillText(rw.emoji,lx,-10);
+    ctx.font='bold 9px Apple SD Gothic Neo,sans-serif';
+    ctx.fillStyle='rgba(0,0,0,.85)';ctx.fillText(rw.name,lx,9,86);
     ctx.restore();
   });
-  ctx.beginPath();ctx.arc(cx,cy,22,0,Math.PI*2);
+  ctx.beginPath();ctx.arc(cx,cy,24,0,Math.PI*2);
   ctx.fillStyle='#0D0D18';ctx.fill();
   ctx.strokeStyle='rgba(255,244,79,.6)';ctx.lineWidth=3;ctx.stroke();
-  ctx.fillStyle='#FFF44F';ctx.font='bold 12px sans-serif';
-  ctx.textAlign='center';ctx.fillText('GO!',cx,cy+4);
+  ctx.fillStyle='#FFF44F';ctx.font='bold 13px sans-serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('GO!',cx,cy+1);
 }
 function doSpin(){
   if(rouAnim||spun)return;
