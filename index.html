@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>J's PLATE | 이거팅</title>
+<style>
+:root {
+  --primary: #FFF44F;
+  --primary-dark: #D4C800;
+  --primary-light: rgba(255,244,79,0.13);
+  --bg: #0D0D18;
+  --bg2: #14141F;
+  --bg3: #1C1C2A;
+  --bg4: #222233;
+  --text: #F0F0F8;
+  --text-muted: #70708A;
+  --border: rgba(255,244,79,0.18);
+  --ice: #64C8FF;
+  --ice-light: rgba(100,200,255,0.12);
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { height:100%; overflow-x:hidden; }
+body {
+  font-family:-apple-system,'Apple SD Gothic Neo','Noto Sans KR',BlinkMacSystemFont,sans-serif;
+  color:var(--text); display:flex; justify-content:center; align-items:flex-start;
+  min-height:100vh; background:#07070F;
+}
+.app { width:100%; max-width:430px; min-height:100vh; background:var(--bg); position:relative; overflow-x:hidden; }
+.hdr {
+  position:fixed; top:0; left:50%; transform:translateX(-50%);
+  width:100%; max-width:430px; z-index:200;
+  background:rgba(13,13,24,0.92); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+  padding:13px 18px; display:flex; align-items:center; justify-content:space-between;
+  border-bottom:1px solid rgba(255,244,79,0.12);
+}
+.hdr-logo { font-size:19px; font-weight:900; color:var(--primary); letter-spacing:-1px; }
+.hdr-wallet {
+  background:var(--primary-light); border:1px solid var(--border); color:var(--primary);
+  padding:7px 13px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer;
+  display:flex; align-items:center; gap:5px; transition:.2s;
+}
+.hdr-wallet:active { background:rgba(255,244,79,0.22); }
+.w-badge { background:var(--primary); color:#000; border-radius:10px; font-size:10px; font-weight:900; padding:1px 6px; min-width:18px; text-align:center; }
+.page { display:none; min-height:100vh; padding-top:62px; }
+.page.active { display:block; animation:fadeUp .3s ease; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+.btn-y { width:100%; padding:17px; background:var(--primary); color:#000; border:none; border-radius:16px; font-size:16px; font-weight:800; cursor:pointer; transition:.18s; letter-spacing:-.3px; }
+.btn-y:active { transform:scale(.97); background:var(--primary-dark); }
+.btn-y:disabled { background:var(--bg3); color:var(--text-muted); transform:none; cursor:not-allowed; }
+.btn-ghost { width:100%; padding:14px; background:transparent; color:var(--text-muted); border:1px solid rgba(255,255,255,.09); border-radius:16px; font-size:14px; font-weight:600; cursor:pointer; transition:.18s; }
+.btn-ghost:active { border-color:var(--border); color:var(--primary); }
+.back-btn { background:none; border:none; color:var(--text-muted); font-size:14px; cursor:pointer; display:flex; align-items:center; gap:4px; margin-bottom:20px; padding:4px 0; }
+.back-btn:active { color:var(--primary); }
+.sec-title { font-size:22px; font-weight:800; letter-spacing:-.5px; }
+.sec-sub { font-size:14px; color:var(--text-muted); margin-top:6px; }
+#page-home .inner { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:calc(100vh - 62px); padding:24px 24px 48px; }
+.store-badge { background:var(--primary-light); border:1px solid var(--border); color:var(--primary); padding:6px 14px; border-radius:20px; font-size:12px; font-weight:700; margin-bottom:28px; }
+.home-icon { font-size:78px; animation:float 3s ease-in-out infinite; display:block; margin-bottom:14px; text-align:center; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+.home-title { font-size:38px; font-weight:900; color:var(--primary); letter-spacing:-1.5px; text-align:center; }
+.home-eng { font-size:13px; color:var(--text-muted); text-align:center; margin-top:4px; margin-bottom:32px; }
+.home-box { background:var(--bg3); border:1px solid rgba(255,255,255,.05); border-radius:16px; padding:16px 18px; font-size:14px; color:var(--text); line-height:1.7; text-align:center; margin-bottom:36px; width:100%; }
+.home-btns { width:100%; display:flex; flex-direction:column; gap:10px; }
+#page-party .inner { padding:24px 20px 48px; }
+.party-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:28px 0; }
+.p-card { background:var(--bg3); border:2px solid rgba(255,255,255,.06); border-radius:20px; padding:22px 14px; text-align:center; cursor:pointer; transition:.2s; }
+.p-card:active, .p-card.sel { border-color:var(--primary); background:var(--primary-light); }
+.p-card.sel .p-icon { transform:scale(1.1); }
+.p-icon { font-size:36px; display:block; margin-bottom:8px; transition:.2s; }
+.p-name { font-size:15px; font-weight:700; }
+.p-desc { font-size:11px; color:var(--text-muted); margin-top:3px; }
+#page-game .inner { padding:16px 18px 32px; min-height:calc(100vh - 62px); display:flex; flex-direction:column; }
+.g-toprow { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+.g-back-btn { background:var(--bg3); border:none; color:var(--text-muted); width:36px; height:36px; border-radius:12px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; transition:.2s; }
+.g-back-btn:active { color:var(--primary); background:var(--primary-light); }
+.g-back-btn.dim { opacity:.25; pointer-events:none; }
+.g-progress-txt { font-size:13px; color:var(--text-muted); font-weight:600; }
+.g-score-txt { font-size:14px; font-weight:800; color:var(--primary); }
+.prog-outer { height:5px; background:var(--bg3); border-radius:99px; margin-bottom:14px; overflow:hidden; }
+.prog-inner { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--primary-dark),var(--primary)); transition:width .4s cubic-bezier(.4,0,.2,1); }
+.gauge-row { display:flex; align-items:center; gap:8px; margin-bottom:16px; }
+.gauge-lbl { font-size:11px; color:var(--text-muted); white-space:nowrap; }
+.gauge-outer { flex:1; height:8px; background:var(--bg3); border-radius:99px; overflow:hidden; }
+.gauge-fill { height:100%; background:linear-gradient(90deg,var(--primary-dark),var(--primary)); border-radius:99px; transition:width .5s cubic-bezier(.4,0,.2,1); position:relative; }
+.gauge-fill::after { content:''; position:absolute; right:0; top:0; bottom:0; width:5px; background:white; border-radius:99px; box-shadow:0 0 5px rgba(255,255,255,.6); }
+.gauge-pct { font-size:13px; font-weight:800; color:var(--primary); white-space:nowrap; }
+.q-type-badge { display:inline-flex; align-items:center; gap:4px; padding:4px 11px; border-radius:20px; font-size:11px; font-weight:700; margin-bottom:16px; background:var(--bg3); border:1px solid rgba(255,255,255,.07); color:var(--text-muted); }
+.q-type-badge.ice { background:var(--ice-light); border-color:rgba(100,200,255,.25); color:var(--ice); }
+.g-card { width:100%; background:var(--bg3); border:1px solid rgba(255,255,255,.07); border-radius:24px; padding:26px 18px 22px; position:relative; overflow:hidden; animation:fadeUp .3s ease; }
+.g-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--primary),transparent); }
+.q-num { font-size:11px; font-weight:700; color:var(--primary); letter-spacing:1px; margin-bottom:8px; }
+.q-text { font-size:20px; font-weight:800; line-height:1.4; margin-bottom:24px; letter-spacing:-.4px; }
+.choices { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.c-btn { padding:18px 10px; background:var(--bg4); border:2px solid rgba(255,255,255,.06); border-radius:16px; color:var(--text); font-size:13px; font-weight:700; cursor:pointer; transition:.18s; text-align:center; line-height:1.45; white-space:pre-line; }
+.c-btn:active { transform:scale(.97); }
+.c-btn.sel-a { background:rgba(255,244,79,.15); border-color:var(--primary); color:var(--primary); }
+.c-btn.sel-b { background:var(--ice-light); border-color:var(--ice); color:var(--ice); }
+.g-nav { display:flex; gap:10px; margin-top:18px; }
+.nav-prev { width:50px; background:var(--bg3); border:1px solid rgba(255,255,255,.08); border-radius:14px; color:var(--text-muted); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:.2s; }
+.nav-prev:active { color:var(--primary); border-color:var(--border); }
+.nav-next { flex:1; padding:15px; background:var(--primary); color:#000; border:none; border-radius:14px; font-size:15px; font-weight:800; cursor:pointer; transition:.18s; }
+.nav-next:active { transform:scale(.97); }
+.nav-next:disabled { background:var(--bg3); color:var(--text-muted); transform:none; cursor:not-allowed; }
+#page-results .inner { padding:22px 18px 48px; }
+.mbti-card { background:linear-gradient(135deg,var(--primary-light),rgba(100,200,255,.07)); border:1px solid var(--border); border-radius:24px; padding:26px 18px; text-align:center; margin-bottom:18px; }
+.mbti-emoji { font-size:56px; display:block; margin-bottom:10px; animation:pop .5s ease; }
+@keyframes pop { 0%{transform:scale(.4);opacity:0} 70%{transform:scale(1.15)} 100%{transform:scale(1);opacity:1} }
+.mbti-type { font-size:13px; font-weight:800; color:var(--primary); letter-spacing:3px; }
+.mbti-name { font-size:24px; font-weight:900; margin:6px 0 10px; }
+.mbti-desc { font-size:14px; color:var(--text-muted); line-height:1.65; }
+.mbti-dish { margin-top:12px; font-size:13px; font-weight:700; color:var(--text); background:rgba(255,255,255,.05); border-radius:12px; padding:9px 12px; }
+.axis-row { display:flex; gap:6px; justify-content:center; margin-top:14px; flex-wrap:wrap; }
+.axis-chip { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:5px 10px; font-size:11px; color:var(--text); }
+.axis-chip b { color:var(--primary); }
+.share-btn { display:inline-flex; align-items:center; gap:6px; background:transparent; border:1px solid var(--border); color:var(--primary); padding:8px 16px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer; margin-top:16px; transition:.18s; }
+.share-btn:active { background:var(--primary-light); }
+.ans-card { background:var(--bg3); border:1px solid rgba(255,255,255,.05); border-radius:20px; padding:18px; margin-bottom:18px; }
+.ans-label { font-size:11px; font-weight:700; color:var(--text-muted); letter-spacing:.5px; text-transform:uppercase; margin-bottom:12px; }
+.ans-item { display:flex; align-items:flex-start; gap:9px; padding:7px 0; border-bottom:1px solid rgba(255,255,255,.05); }
+.ans-item:last-child { border-bottom:none; }
+.ans-num { width:20px; height:20px; border-radius:50%; flex-shrink:0; background:var(--primary-light); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; color:var(--primary); margin-top:1px; }
+.ans-txt { font-size:14px; line-height:1.45; }
+.rec-card { background:linear-gradient(135deg,rgba(255,244,79,.08),rgba(255,244,79,.02)); border:1px solid var(--border); border-radius:20px; padding:18px; margin-bottom:18px; }
+.rec-lbl { font-size:11px; font-weight:700; color:var(--primary); letter-spacing:1px; text-transform:uppercase; margin-bottom:10px; }
+.rec-set-name { font-size:20px; font-weight:900; margin-bottom:5px; }
+.rec-items { font-size:14px; color:var(--text-muted); line-height:1.75; margin-bottom:10px; }
+.rec-price { font-size:20px; font-weight:900; color:var(--primary); }
+.rec-upgrade { font-size:12px; color:var(--text-muted); margin-top:8px; background:rgba(255,255,255,.04); border-radius:10px; padding:8px 12px; }
+.res-btns { display:flex; flex-direction:column; gap:10px; }
+#page-roulette .inner { padding:22px 18px 48px; text-align:center; }
+.rou-title { font-size:24px; font-weight:900; margin-bottom:6px; }
+.rou-sub { font-size:14px; color:var(--text-muted); margin-bottom:30px; }
+.rou-wrap { position:relative; width:300px; height:300px; margin:0 auto 24px; }
+.rou-ptr { position:absolute; top:-14px; left:50%; transform:translateX(-50%); font-size:26px; z-index:10; filter:drop-shadow(0 2px 4px rgba(0,0,0,.5)); }
+#rouCanvas { border-radius:50%; box-shadow:0 0 48px rgba(255,244,79,.18); }
+.spin-btn { padding:17px 48px; background:var(--primary); color:#000; border:none; border-radius:50px; font-size:17px; font-weight:900; cursor:pointer; transition:.18s; }
+.spin-btn:hover:not(:disabled) { transform:scale(1.03); }
+.spin-btn:disabled { background:var(--bg3); color:var(--text-muted); cursor:not-allowed; transform:none; }
+.cpn-result { display:none; background:linear-gradient(135deg,var(--primary-light),rgba(255,244,79,.03)); border:2px solid var(--primary); border-radius:24px; padding:26px 18px; margin:20px 0; animation:fadeUp .4s ease; }
+.cpn-result.show { display:block; }
+.cpn-emoji { font-size:46px; margin-bottom:10px; }
+.cpn-name { font-size:20px; font-weight:900; margin-bottom:5px; }
+.cpn-desc { font-size:13px; color:var(--text-muted); margin-bottom:18px; }
+.barcode-box { background:#fff; border-radius:12px; padding:14px; }
+.barcode-lines { display:flex; align-items:stretch; gap:1px; height:48px; justify-content:center; margin-bottom:7px; }
+.b-line { background:#000; border-radius:1px; flex-shrink:0; }
+.barcode-num { font-size:11px; color:#333; font-family:'Courier New',monospace; letter-spacing:2px; }
+.cpn-exp { font-size:12px; color:var(--text-muted); margin-top:10px; }
+.post-btns { display:flex; gap:10px; margin-top:18px; }
+.post-btns .btn-ghost { flex:1; }
+.post-btns .btn-y { flex:1; }
+#page-menu .inner { padding:0 0 48px; }
+.menu-hero { padding:24px 18px 18px; background:linear-gradient(135deg,var(--bg2),var(--bg3)); border-bottom:1px solid rgba(255,255,255,.05); margin-bottom:10px; }
+.menu-best-badge { display:inline-flex; align-items:center; gap:4px; background:var(--primary); color:#000; padding:4px 11px; border-radius:20px; font-size:11px; font-weight:800; margin-bottom:10px; }
+.menu-hero-title { font-size:26px; font-weight:900; letter-spacing:-1px; margin-bottom:3px; }
+.menu-hero-sub { font-size:13px; color:var(--text-muted); }
+.m-tabs { display:flex; padding:0 18px; gap:6px; overflow-x:auto; padding-bottom:12px; margin-bottom:6px; scrollbar-width:none; -ms-overflow-style:none; }
+.m-tabs::-webkit-scrollbar { display:none; }
+.m-tab { flex-shrink:0; padding:7px 16px; border-radius:20px; font-size:13px; font-weight:600; cursor:pointer; border:1px solid rgba(255,255,255,.08); color:var(--text-muted); background:transparent; transition:.18s; white-space:nowrap; }
+.m-tab.active { background:var(--primary); border-color:var(--primary); color:#000; }
+.sec-lbl { font-size:12px; font-weight:800; color:var(--text-muted); letter-spacing:.5px; text-transform:uppercase; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+.sec-lbl::after { content:''; flex:1; height:1px; background:rgba(255,255,255,.06); }
+.sub-lbl { font-size:12px; font-weight:700; color:var(--primary); margin:14px 0 8px; }
+.set-scroll { display:flex; gap:12px; overflow-x:auto; padding-bottom:8px; scrollbar-width:none; }
+.set-scroll::-webkit-scrollbar { display:none; }
+.set-card { flex-shrink:0; width:220px; background:var(--bg3); border:1px solid rgba(255,255,255,.07); border-radius:20px; padding:17px; position:relative; overflow:hidden; }
+.set-card.rec { border-color:var(--primary); }
+.set-card.rec::after { content:'추천'; position:absolute; top:11px; right:11px; background:var(--primary); color:#000; font-size:10px; font-weight:800; padding:3px 8px; border-radius:8px; }
+.set-name { font-size:16px; font-weight:800; margin-bottom:4px; }
+.set-for { font-size:11px; color:var(--text-muted); margin-bottom:11px; }
+.set-items { font-size:13px; line-height:1.75; margin-bottom:11px; }
+.set-price { font-size:18px; font-weight:900; color:var(--primary); }
+.set-note { font-size:11px; color:var(--text-muted); margin-top:4px; }
+.m-section { padding:0 18px; margin-bottom:18px; }
+.m-item { display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,.05); }
+.m-item:last-child { border-bottom:none; }
+.m-item-ico { font-size:24px; flex-shrink:0; width:42px; height:42px; background:var(--bg3); border-radius:12px; display:flex; align-items:center; justify-content:center; }
+.m-item-info { flex:1; }
+.m-item-name { font-size:15px; font-weight:700; margin-bottom:2px; }
+.m-item-desc { font-size:12px; color:var(--text-muted); line-height:1.4; }
+.m-badges { display:flex; gap:4px; margin-top:5px; flex-wrap:wrap; }
+.badge { padding:2px 7px; border-radius:6px; font-size:10px; font-weight:700; }
+.b-best { background:rgba(255,244,79,.15); color:var(--primary); }
+.b-pop  { background:rgba(255,100,100,.15); color:#FF6464; }
+.b-new  { background:rgba(100,200,100,.15); color:#64C864; }
+.m-item-price { font-size:15px; font-weight:800; flex-shrink:0; padding-top:2px; }
+.menu-footer { padding:0 18px; }
+#page-wallet .inner { padding:22px 18px 48px; }
+.w-empty { text-align:center; padding:60px 20px; color:var(--text-muted); }
+.w-empty-ico { font-size:48px; margin-bottom:12px; }
+.w-cpn-card { background:linear-gradient(135deg,var(--primary-light),rgba(255,244,79,.02)); border:1px solid var(--border); border-radius:20px; padding:18px; margin-bottom:12px; position:relative; overflow:hidden; }
+.w-cpn-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--primary); }
+.w-cpn-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.w-cpn-name { font-size:16px; font-weight:800; }
+.w-cpn-badge { background:var(--primary); color:#000; padding:3px 10px; border-radius:9px; font-size:11px; font-weight:800; }
+.w-cpn-desc { font-size:13px; color:var(--text-muted); margin-bottom:12px; }
+.w-barcode { background:#fff; border-radius:10px; padding:12px; text-align:center; }
+.w-cpn-exp { font-size:11px; color:var(--text-muted); margin-top:8px; text-align:right; }
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:300; align-items:flex-end; justify-content:center; }
+.modal-overlay.open { display:flex; animation:fadeIn .2s; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.modal-sheet { width:100%; max-width:430px; background:var(--bg2); border-radius:24px 24px 0 0; padding:26px 22px 40px; border:1px solid rgba(255,255,255,.07); animation:slideUp .3s ease; }
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.modal-handle { width:36px; height:4px; background:rgba(255,255,255,.12); border-radius:2px; margin:0 auto 20px; }
+.modal-title { font-size:18px; font-weight:800; margin-bottom:5px; }
+.modal-desc { font-size:14px; color:var(--text-muted); margin-bottom:18px; }
+.mbti-share-preview { background:linear-gradient(135deg,var(--bg3),var(--bg4)); border:1px solid var(--border); border-radius:20px; padding:22px; text-align:center; margin-bottom:20px; }
+.share-opts { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:18px; }
+.s-opt { display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; }
+.s-opt-ico { width:48px; height:48px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:22px; }
+.s-opt-lbl { font-size:11px; color:var(--text-muted); }
+.toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); background:rgba(28,28,42,.96); border:1px solid var(--border); color:var(--text); padding:11px 20px; border-radius:12px; font-size:14px; font-weight:600; z-index:400; display:none; white-space:nowrap; backdrop-filter:blur(10px); }
+.toast.show { display:block; animation:toastIn .3s ease; }
+@keyframes toastIn { from { transform:translateX(-50%) translateY(16px); opacity:0; } to { transform:translateX(-50%) translateY(0); opacity:1; } }
+</style>
+</head>
+<body>
+<div class="app">
+<div class="hdr">
+  <div class="hdr-logo">🍝 J's PLATE</div>
+  <button class="hdr-wallet" onclick="goWallet()">🎫 쿠폰 <span class="w-badge" id="wBadge">0</span></button>
+</div>
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="inner">
+    <div class="store-badge">📍 J's PLATE — 파스타 &amp; 피자</div>
+    <span class="home-icon">🍝</span>
+    <div class="home-title">J's PLATE</div>
+    <div class="home-eng">제이스 플레이트 · 웨이팅이 설레는 시간으로</div>
+    <div class="home-box">기다리는 시간을 즐기는 시간으로 💛<br>밸런스 게임으로 나의 입맛 유형을 발견하고<br>맞춤 추천 메뉴와 쿠폰을 받아보세요!</div>
+    <div class="home-btns">
+      <button class="btn-y" onclick="showPage('party')">⚡ 웨이팅 즐기기 시작</button>
+      <button class="btn-ghost" onclick="showPage('menu')">🍽️ 건너뛰고 메뉴 보기</button>
+    </div>
+  </div>
+</div>
+
+<!-- PARTY -->
+<div class="page" id="page-party">
+  <div class="inner">
+    <button class="back-btn" onclick="showPage('home')">← 뒤로</button>
+    <div class="sec-title">오늘 함께하시는 분은?</div>
+    <div class="sec-sub">함께하는 분들에 맞게 맞춤 질문을 준비할게요</div>
+    <div class="party-grid">
+      <div class="p-card" onclick="selectParty('couple',this)"><span class="p-icon">💕</span><div class="p-name">커플</div><div class="p-desc">로맨틱한 식사</div></div>
+      <div class="p-card" onclick="selectParty('friends',this)"><span class="p-icon">👥</span><div class="p-name">친구</div><div class="p-desc">신나는 만남</div></div>
+      <div class="p-card" onclick="selectParty('work',this)"><span class="p-icon">🥂</span><div class="p-name">회식</div><div class="p-desc">즐거운 팀 저녁</div></div>
+      <div class="p-card" onclick="selectParty('family',this)"><span class="p-icon">👨‍👩‍👧</span><div class="p-name">가족</div><div class="p-desc">따뜻한 가족 식사</div></div>
+    </div>
+    <button class="btn-y" id="startBtn" onclick="startGame()" disabled style="opacity:.35;">🎮 밸런스 게임 시작!</button>
+    <button class="btn-ghost" onclick="showPage('menu')" style="margin-top:10px;">🍽️ 건너뛰고 메뉴 보기</button>
+  </div>
+</div>
+
+<!-- GAME -->
+<div class="page" id="page-game">
+  <div class="inner">
+    <div class="g-toprow">
+      <button class="g-back-btn dim" id="gBackBtn" onclick="prevQ()">←</button>
+      <span class="g-progress-txt" id="gProgTxt">1 / 7</span>
+      <span class="g-score-txt" id="gScoreTxt">0점</span>
+    </div>
+    <div class="prog-outer"><div class="prog-inner" id="progBar" style="width:0%"></div></div>
+    <div class="gauge-row">
+      <span class="gauge-lbl">취향 분석</span>
+      <div class="gauge-outer"><div class="gauge-fill" id="gaugeFill" style="width:0%"></div></div>
+      <span class="gauge-pct" id="gaugePct">0%</span>
+    </div>
+    <div class="q-type-badge" id="qTypeBadge">🍝 메뉴 취향</div>
+    <div class="g-card" id="gCard">
+      <div class="q-num" id="qNum">QUESTION 01</div>
+      <div class="q-text" id="qText">질문 로딩 중...</div>
+      <div class="choices">
+        <button class="c-btn" id="choiceA" onclick="pickChoice('A')">A</button>
+        <button class="c-btn" id="choiceB" onclick="pickChoice('B')">B</button>
+      </div>
+    </div>
+    <div class="g-nav">
+      <button class="nav-prev" onclick="prevQ()">←</button>
+      <button class="nav-next" id="nextBtn" onclick="nextQ()" disabled>다음 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="page" id="page-results">
+  <div class="inner">
+    <div class="mbti-card">
+      <span class="mbti-emoji" id="mbtiEmoji">🍝</span>
+      <div class="mbti-type" id="mbtiType">KURI</div>
+      <div class="mbti-name" id="mbtiName">크림 정복자</div>
+      <div class="mbti-desc" id="mbtiDesc">설명</div>
+      <div class="mbti-dish" id="mbtiDish"></div>
+      <div class="axis-row" id="axisRow"></div>
+      <button class="share-btn" onclick="openShare()">📤 SNS에 입맛 유형 공유</button>
+    </div>
+    <div class="ans-card"><div class="ans-label">선택된 답안</div><div id="ansList"></div></div>
+    <div class="rec-card">
+      <div class="rec-lbl">🎯 맞춤 추천 세트</div>
+      <div class="rec-set-name" id="recName">Set</div>
+      <div class="rec-items" id="recItems"></div>
+      <div class="rec-price" id="recPrice">₩0</div>
+      <div class="rec-upgrade" id="recUpgrade"></div>
+    </div>
+    <div class="res-btns">
+      <button class="btn-y" onclick="showPage('roulette')">🎰 보상 룰렛 돌리기</button>
+      <button class="btn-ghost" onclick="showPage('menu')">🍽️ 전체 메뉴 보기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ROULETTE -->
+<div class="page" id="page-roulette">
+  <div class="inner">
+    <div class="rou-title">🎰 보상 룰렛</div>
+    <div class="rou-sub">한 번의 기회! 행운을 빌어요 ✨</div>
+    <div class="rou-wrap"><div class="rou-ptr">▼</div><canvas id="rouCanvas" width="300" height="300"></canvas></div>
+    <button class="spin-btn" id="spinBtn" onclick="doSpin()">✨ 룰렛 돌리기</button>
+    <div class="cpn-result" id="cpnResult">
+      <div class="cpn-emoji" id="cpnEmoji">🥤</div>
+      <div class="cpn-name" id="cpnName">음료 무료</div>
+      <div class="cpn-desc" id="cpnDesc">사장님께 이 화면을 보여주세요!</div>
+      <div class="barcode-box"><div class="barcode-lines" id="bcLines"></div><div class="barcode-num" id="bcNum">8809000000000</div></div>
+      <div class="cpn-exp" id="cpnExp">유효기간: 오늘 영업 종료까지</div>
+    </div>
+    <div class="post-btns" id="postBtns" style="display:none;">
+      <button class="btn-ghost" onclick="goWallet()">🎫 쿠폰 보관함</button>
+      <button class="btn-y" onclick="showPage('home')">🏠 홈으로</button>
+    </div>
+  </div>
+</div>
+
+<!-- MENU -->
+<div class="page" id="page-menu">
+  <div class="inner">
+    <div class="menu-hero">
+      <button class="back-btn" onclick="showPage('home')" style="margin-bottom:10px;">← 뒤로</button>
+      <div class="menu-best-badge">⭐ 오늘의 메뉴</div>
+      <div class="menu-hero-title">J's PLATE</div>
+      <div class="menu-hero-sub">파스타 · 피자 · 리조또</div>
+    </div>
+    <div style="padding:14px 18px 0;">
+      <div class="m-tabs">
+        <button class="m-tab active" onclick="filterMenu('all',this)">전체</button>
+        <button class="m-tab" onclick="filterMenu('set',this)">세트</button>
+        <button class="m-tab" onclick="filterMenu('sr',this)">샐러드·리조또</button>
+        <button class="m-tab" onclick="filterMenu('pasta',this)">파스타</button>
+        <button class="m-tab" onclick="filterMenu('pizza',this)">피자</button>
+        <button class="m-tab" onclick="filterMenu('drink',this)">음료·주류</button>
+      </div>
+    </div>
+    <div class="m-section" id="ms-set">
+      <div class="sec-lbl">🍽️ 세트 메뉴</div>
+      <div class="set-scroll">
+        <div class="set-card rec"><div class="set-name">1인 세트 ①</div><div class="set-for">혼자 든든하게</div><div class="set-items">🍝 파스타 × 1<br>🥤 음료 × 1</div><div class="set-price">₩8,900</div><div class="set-note">리조또 변경 +1,000 / 면 추가 가능</div></div>
+        <div class="set-card"><div class="set-name">1인 세트 ②</div><div class="set-for">맥주 한 잔과</div><div class="set-items">🍝 파스타 × 1<br>🍺 버드와이저 × 1</div><div class="set-price">₩9,900</div></div>
+        <div class="set-card rec"><div class="set-name">2인 세트</div><div class="set-for">둘이 푸짐하게</div><div class="set-items">🥗 미니 샐러드<br>🍝 파스타(면추가)<br>🍕 피자 + 🥤 음료 2잔</div><div class="set-price">₩19,900</div><div class="set-note">버드와이저 변경 1병당 +1,500</div></div>
+      </div>
+    </div>
+    <div class="m-section" id="ms-sr">
+      <div class="sec-lbl">🥗 샐러드</div>
+      <div class="m-item"><div class="m-item-ico">🍗</div><div class="m-item-info"><div class="m-item-name">닭안심 샐러드</div><div class="m-item-desc">Chicken Salad</div></div><div class="m-item-price">₩7,900</div></div>
+      <div class="m-item"><div class="m-item-ico">🦐</div><div class="m-item-info"><div class="m-item-name">해산물 샐러드</div><div class="m-item-desc">Seafood Salad</div></div><div class="m-item-price">₩7,900</div></div>
+      <div class="m-item"><div class="m-item-ico">🍤</div><div class="m-item-info"><div class="m-item-name">새우 샐러드</div><div class="m-item-desc">Shrimp Salad</div></div><div class="m-item-price">₩7,900</div></div>
+      <div class="sec-lbl" style="margin-top:18px;">🍚 리조또</div>
+      <div class="m-item"><div class="m-item-ico">🦪</div><div class="m-item-info"><div class="m-item-name">로제 해산물 리조또</div><div class="m-item-desc">Seafood Risotto w/Rose Sauce</div></div><div class="m-item-price">₩8,900</div></div>
+      <div class="m-item"><div class="m-item-ico">🥓</div><div class="m-item-info"><div class="m-item-name">크림베이컨 리조또</div><div class="m-item-desc">Bacon Risotto w/Cream Sauce</div></div><div class="m-item-price">₩8,900</div></div>
+      <div class="m-item"><div class="m-item-ico">🍛</div><div class="m-item-info"><div class="m-item-name">카레크림 리조또</div><div class="m-item-desc">Bacon Risotto w/Creamy Curry Sauce</div><div class="m-badges"><span class="badge b-new">이색</span></div></div><div class="m-item-price">₩8,900</div></div>
+    </div>
+    <div class="m-section" id="ms-pasta">
+      <div class="sec-lbl">🍝 파스타</div>
+      <div class="sub-lbl">크림소스 Cream</div>
+      <div class="m-item"><div class="m-item-ico">🍝</div><div class="m-item-info"><div class="m-item-name">까르보나라</div><div class="m-item-desc">Carbonara</div><div class="m-badges"><span class="badge b-best">BEST</span></div></div><div class="m-item-price">₩7,800</div></div>
+      <div class="m-item"><div class="m-item-ico">🌶️</div><div class="m-item-info"><div class="m-item-name">불닭 까르보나라</div><div class="m-item-desc">Spicy Chicken Pasta w/Cream</div><div class="m-badges"><span class="badge b-pop">매콤</span></div></div><div class="m-item-price">₩8,900</div></div>
+      <div class="m-item"><div class="m-item-ico">🦞</div><div class="m-item-info"><div class="m-item-name">마쉐 크림 파스타</div><div class="m-item-desc">Seafood Pasta w/Cream</div></div><div class="m-item-price">₩8,900</div></div>
+      <div class="m-item"><div class="m-item-ico">🍜</div><div class="m-item-info"><div class="m-item-name">나가사키 크림 파스타</div><div class="m-item-desc">Seafood Pasta w/Nagasaki Cream</div></div><div class="m-item-price">₩8,900</div></div>
+      <div class="sub-lbl">로제소스 Rose</div>
+      <div class="m-item"><div class="m-item-ico">🩷</div><div class="m-item-info"><div class="m-item-name">로제 파스타</div><div class="m-item-desc">Rose Sauce Pasta</div></div><div class="m-item-price">₩7,800</div></div>
+      <div class="m-item"><div class="m-item-ico">🦑</div><div class="m-item-info"><div class="m-item-name">로제 새우 낙지 파스타</div><div class="m-item-desc">Shrimp Pasta w/Rose</div></div><div class="m-item-price">₩8,900</div></div>
+      <div class="m-item"><div class="m-item-ico">🥓</div><div class="m-item-info"><div class="m-item-name">베이컨 로제 파스타</div><div class="m-item-desc">Bacon Pasta w/Rose</div></div><div class="m-item-price">₩8,900</div></div>
+      <div class="m-item"><div class="m-item-ico">🦪</div><div class="m-item-info"><div class="m-item-name">마쉐 로제 파스타</div><div class="m-item-desc">Seafood Pasta w/Rose</div></div><div class="m-item-price">₩8,900</div></div>
+      <div class="sub-lbl">토마토소스 Tomato</div>
+      <div class="m-item"><div class="m-item-ico">🍅</div><div class="m-item-info"><div class="m-item-name">뽀모도로</div><div class="m-item-desc">Pomodoro</div></div><div class="m-item-price">₩7,800</div></div>
+      <div class="m-item"><div class="m-item-ico">🌶️</div><div class="m-item-info"><div class="m-item-name">고추장 토마토 닭안심 파스타</div><div class="m-item-desc">Chicken Pasta w/Gochujang Tomato</div></div><div class="m-item-price">₩7,900</div></div>
+      <div class="m-item"><div class="m-item-ico">🦞</div><div class="m-item-info"><div class="m-item-name">마쉐 토마토 파스타</div><div class="m-item-desc">Seafood Pasta w/Tomato</div></div><div class="m-item-price">₩8,900</div></div>
+      <div class="m-item"><div class="m-item-ico">🍛</div><div class="m-item-info"><div class="m-item-name">카레 토마토 파스타</div><div class="m-item-desc">Seafood Pasta w/Tomato Curry</div></div><div class="m-item-price">₩8,900</div></div>
+      <div class="m-item"><div class="m-item-ico">🥩</div><div class="m-item-info"><div class="m-item-name">우삼겹 토마토 파스타</div><div class="m-item-desc">Beef Pasta w/Tomato</div><div class="m-badges"><span class="badge b-pop">인기</span></div></div><div class="m-item-price">₩8,900</div></div>
+      <div class="sub-lbl">오일 Olive Oil</div>
+      <div class="m-item"><div class="m-item-ico">🫒</div><div class="m-item-info"><div class="m-item-name">엔초비 루꼴라 오일파스타</div><div class="m-item-desc">Anchovy & Rucola Pasta w/Olive</div></div><div class="m-item-price">₩7,800</div></div>
+      <div class="m-item"><div class="m-item-ico">🦐</div><div class="m-item-info"><div class="m-item-name">해산물 오일파스타</div><div class="m-item-desc">Seafood Pasta w/Olive</div></div><div class="m-item-price">₩8,900</div></div>
+      <div class="m-item"><div class="m-item-ico">🌶️</div><div class="m-item-info"><div class="m-item-name">우삼겹 할라피뇨 오일파스타</div><div class="m-item-desc">Beef Jalapeno Pasta w/Olive</div><div class="m-badges"><span class="badge b-pop">매콤</span></div></div><div class="m-item-price">₩8,900</div></div>
+    </div>
+    <div class="m-section" id="ms-pizza">
+      <div class="sec-lbl">🍕 피자</div>
+      <div class="m-item"><div class="m-item-ico">🍕</div><div class="m-item-info"><div class="m-item-name">마르게리따</div><div class="m-item-desc">Margherita Pizza</div><div class="m-badges"><span class="badge b-best">BEST</span></div></div><div class="m-item-price">₩8,600</div></div>
+      <div class="m-item"><div class="m-item-ico">🍄</div><div class="m-item-info"><div class="m-item-name">버섯 피자</div><div class="m-item-desc">Mushroom Pizza</div></div><div class="m-item-price">₩8,600</div></div>
+      <div class="m-item"><div class="m-item-ico">🥓</div><div class="m-item-info"><div class="m-item-name">베이컨 포테이토 피자</div><div class="m-item-desc">Bacon Potato Pizza</div></div><div class="m-item-price">₩9,600</div></div>
+      <div class="m-item"><div class="m-item-ico">🧀</div><div class="m-item-info"><div class="m-item-name">고르곤졸라</div><div class="m-item-desc">Gorgonzola Pizza w/Honey</div><div class="m-badges"><span class="badge b-pop">인기</span></div></div><div class="m-item-price">₩8,600</div></div>
+      <div class="m-item"><div class="m-item-ico">🥬</div><div class="m-item-info"><div class="m-item-name">루꼴라 피자</div><div class="m-item-desc">Rucola Pizza</div></div><div class="m-item-price">₩8,600</div></div>
+      <div class="m-item"><div class="m-item-ico">🍤</div><div class="m-item-info"><div class="m-item-name">슈림프 루꼴라 피자</div><div class="m-item-desc">Shrimp & Rucola Pizza</div></div><div class="m-item-price">₩9,600</div></div>
+    </div>
+    <div class="m-section" id="ms-drink">
+      <div class="sec-lbl">🥤 음료</div>
+      <div class="m-item"><div class="m-item-ico">🥤</div><div class="m-item-info"><div class="m-item-name">콜라 / 사이다</div><div class="m-item-desc">Coca-cola / Sprite</div></div><div class="m-item-price">₩2,000</div></div>
+      <div class="m-item"><div class="m-item-ico">🍋</div><div class="m-item-info"><div class="m-item-name">레몬 / 오렌지 에이드</div><div class="m-item-desc">Lemon / Orange Ade</div></div><div class="m-item-price">₩3,800</div></div>
+      <div class="m-item"><div class="m-item-ico">🍊</div><div class="m-item-info"><div class="m-item-name">오렌지 주스</div><div class="m-item-desc">Orange Juice</div></div><div class="m-item-price">₩4,300</div></div>
+      <div class="m-item"><div class="m-item-ico">🍹</div><div class="m-item-info"><div class="m-item-name">자몽 주스 / 에이드</div><div class="m-item-desc">Grapefruit Juice / Ade</div></div><div class="m-item-price">₩4,300</div></div>
+      <div class="m-item"><div class="m-item-ico">🥝</div><div class="m-item-info"><div class="m-item-name">유자 스무디</div><div class="m-item-desc">Citron Smoothie</div></div><div class="m-item-price">₩4,300</div></div>
+      <div class="m-item"><div class="m-item-ico">🍫</div><div class="m-item-info"><div class="m-item-name">핫초코 / 아이스초코</div><div class="m-item-desc">Hot / Iced Chocolate</div></div><div class="m-item-price">₩3,500</div></div>
+      <div class="sec-lbl" style="margin-top:18px;">☕ 커피 &amp; 주류</div>
+      <div class="m-item"><div class="m-item-ico">☕</div><div class="m-item-info"><div class="m-item-name">아메리카노</div><div class="m-item-desc">Americano</div></div><div class="m-item-price">₩3,000</div></div>
+      <div class="m-item"><div class="m-item-ico">🥛</div><div class="m-item-info"><div class="m-item-name">카페라떼</div><div class="m-item-desc">Caffe Latte</div></div><div class="m-item-price">₩3,500</div></div>
+      <div class="m-item"><div class="m-item-ico">🍺</div><div class="m-item-info"><div class="m-item-name">버드와이저</div><div class="m-item-desc">Budweiser</div></div><div class="m-item-price">₩3,000</div></div>
+      <div class="m-item"><div class="m-item-ico">🍻</div><div class="m-item-info"><div class="m-item-name">호가든</div><div class="m-item-desc">Hoegaarden</div></div><div class="m-item-price">₩4,000</div></div>
+      <div class="sec-lbl" style="margin-top:18px;">🍰 디저트</div>
+      <div class="m-item"><div class="m-item-ico">🍫</div><div class="m-item-info"><div class="m-item-name">퐁당쇼콜라</div><div class="m-item-desc">Fondant Chocolat</div></div><div class="m-item-price">₩4,000</div></div>
+    </div>
+    <div class="menu-footer"><button class="btn-y" onclick="showPage('home')">🏠 홈으로</button></div>
+  </div>
+</div>
+
+<!-- WALLET -->
+<div class="page" id="page-wallet">
+  <div class="inner">
+    <button class="back-btn" onclick="goBack()">← 뒤로</button>
+    <div class="sec-title" style="margin-bottom:4px;">🎫 쿠폰 보관함</div>
+    <div style="font-size:14px;color:var(--text-muted);margin-bottom:24px;">획득한 쿠폰을 사장님께 보여주세요</div>
+    <div id="walletList"></div>
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="modal-overlay" id="shareModal" onclick="closeShare(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🎉 나의 입맛 유형 공유</div>
+    <div class="modal-desc">친구들에게 나의 취향을 자랑해보세요!</div>
+    <div class="mbti-share-preview">
+      <div style="font-size:38px;margin-bottom:8px;" id="sMbtiEmoji">🍝</div>
+      <div style="font-size:12px;color:var(--primary);letter-spacing:3px;font-weight:800;margin-bottom:4px;" id="sMbtiType">KURI</div>
+      <div style="font-size:20px;font-weight:900;margin-bottom:6px;" id="sMbtiName">크림 정복자</div>
+      <div style="font-size:13px;color:var(--text-muted);" id="sMbtiDesc">설명</div>
+      <div style="margin-top:14px;font-size:11px;color:var(--text-muted);">🍝 J's PLATE</div>
+    </div>
+    <div class="share-opts">
+      <div class="s-opt" onclick="copyLink()"><div class="s-opt-ico" style="background:var(--bg3);">🔗</div><div class="s-opt-lbl">링크 복사</div></div>
+      <div class="s-opt" onclick="toastShare('카카오톡')"><div class="s-opt-ico" style="background:#FEE500;">💬</div><div class="s-opt-lbl">카카오톡</div></div>
+      <div class="s-opt" onclick="toastShare('인스타그램')"><div class="s-opt-ico" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);">📸</div><div class="s-opt-lbl">인스타</div></div>
+      <div class="s-opt" onclick="toastShare('X')"><div class="s-opt-ico" style="background:#000;border:1px solid #333;">𝕏</div><div class="s-opt-lbl">X</div></div>
+    </div>
+    <button class="btn-ghost" onclick="closeShare()">닫기</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+</div>
+
+<script>
+let party=null,curQ=0,TOTAL_Q=7,answers=new Array(7).fill(null),score=0,coupons=[],spun=false,prevPage='home',rouAngle=0,rouAnim=false;
+
+/* 4대 축 (J's PLATE 메뉴 기반)
+   1) 맛: K(진한·매콤: 크림·불닭·할라피뇨) / S(담백·산뜻: 오일·토마토·샐러드)
+   2) 도전: A(이색 신메뉴: 카레크림·나가사키·우삼겹) / U(클래식: 까르보나라·뽀모도로·마르게리따)
+   3) 가치: R(실속·푸짐·맛) / P(감성·비주얼·피자·디저트)
+   4) 방식: I(혼자 1인 세트) / E(함께 2인 세트·나눔)
+   A 선택→axisA, B 선택→axisB 누적. 질문은 일행 상황으로 자연스럽게 묻되 실제 메뉴를 넣음. */
+const Qs={
+  couple:[
+    {ice:false,text:'오늘 둘이 먹을 파스타 소스는?',a:'🥛 진한 크림소스\n(까르보나라·마쉐크림)',b:'🫒 산뜻한 오일·토마토\n(뽀모도로·엔초비)',axisA:'K',axisB:'S'},
+    {ice:true,text:'메뉴 고를 때 우리 둘은?',a:'🆕 이색 신메뉴\n(카레크림·나가사키) 도전',b:'😌 검증된 클래식\n(까르보나라·마르게리따)',axisA:'A',axisB:'U'},
+    {ice:false,text:'이 집에서 더 끌리는 건?',a:'🍝 든든한 파스타\n(푸짐하게)',b:'🍕 예쁜 피자\n(비주얼·나눔 감성)',axisA:'R',axisB:'P'},
+    {ice:false,text:'주문은 어떻게 할까?',a:'🍽️ 각자 1인 세트\n내 메뉴는 내 것',b:'🥢 2인 세트로\n나눠 먹기',axisA:'I',axisB:'E'},
+    {ice:true,text:'매운맛, 둘이 도전?',a:'🌶️ 불닭 까르보나라·\n할라피뇨 콜!',b:'🧀 순한 로제·\n고르곤졸라가 좋아',axisA:'K',axisB:'S'},
+    {ice:false,text:'음료·주류는?',a:'🍋 새로운 에이드·\n유자 스무디',b:'🍺 늘 마시던\n콜라·버드와이저',axisA:'A',axisB:'U'},
+    {ice:true,text:'식사 마무리는?',a:'🍝 면 추가로\n배부르게',b:'🍫 퐁당쇼콜라로\n예쁘게 마무리',axisA:'R',axisB:'P'}
+  ],
+  friends:[
+    {ice:false,text:'친구들이랑 끌리는 소스는?',a:'🥛 진한 크림\n(불닭 까르보나라!)',b:'🫒 산뜻한 오일·토마토\n(뽀모도로·엔초비)',axisA:'K',axisB:'S'},
+    {ice:true,text:'우리 무리 메뉴 스타일은?',a:'🎢 이색 신메뉴\n(나가사키·카레크림) 질러',b:'🍻 검증된 클래식\n(까르보나라)이 진리',axisA:'A',axisB:'U'},
+    {ice:false,text:'오늘 모임, 뭐가 더 끌려?',a:'🍝 가성비·푸짐한\n파스타',b:'🍕 인증샷용\n예쁜 피자',axisA:'R',axisB:'P'},
+    {ice:false,text:'주문할 때 우리는?',a:'🙋 각자 먹고 싶은 거\n따로 시켜',b:'🍕 다 같이 시켜\n나눠 먹어',axisA:'I',axisB:'E'},
+    {ice:true,text:'스트레스 받은 날엔?',a:'🌶️ 매운 불닭·\n할라피뇨로 확 풀자',b:'🧀 순한 로제·\n크림으로 힐링',axisA:'K',axisB:'S'},
+    {ice:false,text:'오늘 마실 건?',a:'🍹 새로운 에이드·\n스무디 도전',b:'🍺 늘 마시던\n버드와이저·콜라',axisA:'A',axisB:'U'},
+    {ice:true,text:'오늘 모임, 남는 건?',a:'🤣 배부른 추억\n(사진은 글쎄)',b:'📸 인생샷·\n피자 비주얼샷',axisA:'R',axisB:'P'}
+  ],
+  work:[
+    {ice:false,text:'회식 파스타 소스는?',a:'🥛 진한 크림으로\n든든하게',b:'🫒 담백한 오일·토마토로\n무난하게',axisA:'K',axisB:'S'},
+    {ice:true,text:'우리 팀 메뉴 스타일은?',a:'🎯 새 메뉴\n(우삼겹·카레크림) 도전',b:'🏠 검증된 클래식\n(까르보나라·마르게리따)',axisA:'A',axisB:'U'},
+    {ice:false,text:'회식 메뉴 정할 때 우선은?',a:'💰 맛·가성비\n좋은 거',b:'🍕 보기 좋고\n나눠 먹기 좋은 피자',axisA:'R',axisB:'P'},
+    {ice:false,text:'음식 나오면 우리 팀은?',a:'🍽️ 각자 메뉴\n알아서 먹기',b:'🥢 다 같이 나눠\n정 나누기',axisA:'I',axisB:'E'},
+    {ice:true,text:'매운맛 도전, 팀 분위기는?',a:'🌶️ 불닭·할라피뇨\n콜!',b:'🧀 순한 로제·\n크림이 무난',axisA:'K',axisB:'S'},
+    {ice:false,text:'건배주는?',a:'🍻 호가든·새로운\n주류 도전',b:'🍺 늘 마시던\n버드와이저',axisA:'A',axisB:'U'},
+    {ice:true,text:'회식 사진은?',a:'🙅 먹기 바빠\n안 찍어',b:'📸 단체샷·\n메뉴샷 필수',axisA:'R',axisB:'P'}
+  ],
+  family:[
+    {ice:false,text:'가족이 좋아하는 소스는?',a:'🥛 진한 크림·로제\n(입맛 도는)',b:'🫒 담백한 오일·토마토\n(속 편한)',axisA:'K',axisB:'S'},
+    {ice:true,text:'가족 메뉴 고를 때?',a:'🍽️ 새 메뉴\n(카레크림·우삼겹) 도전',b:'😊 늘 먹던\n뽀모도로·마르게리따',axisA:'A',axisB:'U'},
+    {ice:false,text:'우리 가족이 중요하게 보는 건?',a:'👍 맛있고 푸짐한 거\n(양 많은 게 최고)',b:'🌸 예쁘고 나눠 먹기\n좋은 피자',axisA:'R',axisB:'P'},
+    {ice:false,text:'음식이 나오면?',a:'🍽️ 각자 시킨 거\n따로 먹어',b:'🥢 다 같이\n나눠 먹어',axisA:'I',axisB:'E'},
+    {ice:true,text:'가족이 즐기는 맛은?',a:'🌶️ 입맛 확 도는\n진한 맛',b:'🍚 부담 없는\n담백한 맛',axisA:'K',axisB:'S'},
+    {ice:false,text:'음료는?',a:'🥝 새로운 스무디·\n에이드 시도',b:'🥤 늘 마시던\n콜라·주스',axisA:'A',axisB:'U'},
+    {ice:true,text:'가족 외식 사진은?',a:'😋 먹느라\n바빠',b:'📷 다 같이\n한 컷 남기기',axisA:'R',axisB:'P'}
+  ]
+};
+
+const AXIS_KR={K:'진한맛',S:'담백',A:'도전',U:'클래식',R:'실속',P:'감성',I:'혼자',E:'함께'};
+
+/* 16유형: 코드(4축) → 닉네임/이모지/설명/추천 한 그릇 (모두 J's PLATE 메뉴 기준) */
+const MBTI16={
+  KARE:{name:'이색 크림 셰어러',emoji:'🍛',desc:'새로운 진한 메뉴를 다 같이 푸짐하게 나눠 먹는 미식 대장',dish:'카레크림 리조또'},
+  KARI:{name:'진한맛 개척자',emoji:'🔥',desc:'남들 안 시키는 진한 신메뉴를 혼자 든든히 정복하는 타입',dish:'불닭 까르보나라'},
+  KAPE:{name:'핫플 비주얼러',emoji:'📸',desc:'비주얼 좋은 이색 진한 메뉴를 함께 인증샷 찍으며 즐기는 타입',dish:'슈림프 루꼴라 피자 + 마쉐 크림'},
+  KAPI:{name:'감성 얼리어답터',emoji:'🎨',desc:'화려한 이색 진한 메뉴를 혼자 조용히 음미하는 미식 탐험가',dish:'나가사키 크림 파스타'},
+  KURE:{name:'크림 의리파',emoji:'🧈',desc:'검증된 진한 크림 맛을 다 같이 푸짐하게 나누는 의리파',dish:'까르보나라 + 베이컨 포테이토 피자'},
+  KURI:{name:'크림 정복자',emoji:'🍝',desc:'늘 먹던 진한 까르보나라를 혼자 확실하게 즐기는 든든파',dish:'까르보나라'},
+  KUPE:{name:'감성 파티원',emoji:'🥂',desc:'검증된 진한 맛을 예쁜 자리에서 함께 즐기는 분위기 메이커',dish:'고르곤졸라 피자 + 크림 파스타'},
+  KUPI:{name:'비주얼 힐러',emoji:'🍮',desc:'이쁘게 나온 클래식 크림 메뉴를 혼자 눈과 입으로 즐기는 타입',dish:'베이컨 로제 파스타'},
+  SARE:{name:'산뜻 미식 원정대',emoji:'🥗',desc:'산뜻한 이색 메뉴를 다 같이 알차게 나눠 먹는 탐방러',dish:'우삼겹 할라피뇨 오일파스타'},
+  SARI:{name:'담백 미식가',emoji:'🌿',desc:'남들 안 찾는 산뜻한 이색 파스타를 혼자 음미하는 타입',dish:'엔초비 루꼴라 오일파스타'},
+  SAPE:{name:'감성 트렌드세터',emoji:'🥐',desc:'산뜻하고 예쁜 이색 메뉴를 함께 나누며 소통하는 타입',dish:'루꼴라 피자 + 카레 토마토'},
+  SAPI:{name:'산뜻 미니멀리스트',emoji:'🍵',desc:'정갈하고 산뜻한 이색 메뉴를 혼자 즐기는 차분한 미식가',dish:'카레 토마토 파스타'},
+  SURE:{name:'담백 패밀리',emoji:'🍅',desc:'정겨운 클래식 담백 메뉴를 다 같이 푸짐하게 나누는 타입',dish:'뽀모도로 + 마르게리따 피자'},
+  SURI:{name:'뚝심 담백파',emoji:'🫒',desc:'유행 안 타는 담백한 뽀모도로를 혼자 든든히 즐기는 소나무',dish:'뽀모도로'},
+  SUPE:{name:'평화주의자',emoji:'🍃',desc:'검증된 담백·산뜻 메뉴를 예쁜 분위기에서 함께 즐기는 타입',dish:'마르게리따 피자 + 토마토 파스타'},
+  SUPI:{name:'깔끔 혼밥러',emoji:'🍱',desc:'깔끔한 클래식 메뉴를 1인 상으로 온전히 즐기는 타입',dish:'마르게리따 피자'}
+};
+
+const PARTY_KR={couple:'💕 커플',friends:'👥 친구',work:'🥂 회식',family:'👨‍👩‍👧 가족'};
+
+function recommendSet(L,party){
+  const share=L.a4==='E';
+  let pasta;
+  if(L.a1==='K'){ pasta = L.a2==='A' ? '불닭 까르보나라 또는 카레크림 리조또' : '까르보나라 (크림 클래식)'; }
+  else { pasta = L.a2==='A' ? '우삼겹 할라피뇨 오일 또는 카레 토마토' : '뽀모도로 또는 엔초비 루꼴라 오일'; }
+  const pizza = L.a3==='P' ? (L.a2==='A' ? '슈림프 루꼴라 피자' : '고르곤졸라 피자') : '마르게리따 피자';
+  if(share){
+    return {name:'2인 세트',price:'₩19,900',items:`🥗 미니 샐러드\n🍝 ${pasta}\n🍕 ${pizza}\n🥤 음료 2잔`,upgrade:'💡 둘이 나눠 먹기 딱! 버드와이저 변경 +1,500원/병'};
+  }
+  return {name:'1인 세트',price:'₩8,900',items:`🍝 ${pasta}\n🥤 음료 1잔`,upgrade:(L.a3==='P'?('💡 비주얼파라면 '+pizza+' 추가 추천!'):'💡 맥주 한 잔 곁들이면 1인 세트② 9,900원')};
+}
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='roulette')initRoulette();
+}
+function goWallet(){ prevPage=document.querySelector('.page.active').id.replace('page-',''); showPage('wallet'); renderWallet(); }
+function goBack(){ showPage(prevPage||'home'); }
+
+function selectParty(type,el){
+  party=type;
+  document.querySelectorAll('.p-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  const btn=document.getElementById('startBtn');
+  btn.disabled=false; btn.style.opacity='1';
+}
+function startGame(){ if(!party)return; curQ=0; score=0; answers=new Array(TOTAL_Q).fill(null); showPage('game'); renderQ(); }
+
+function renderQ(){
+  const qs=Qs[party],q=qs[curQ];
+  document.getElementById('gProgTxt').textContent=`${curQ+1} / ${TOTAL_Q}`;
+  document.getElementById('progBar').style.width=`${(curQ/TOTAL_Q)*100}%`;
+  const pct=Math.round((score/(TOTAL_Q*20))*100);
+  document.getElementById('gaugeFill').style.width=Math.min(pct,100)+'%';
+  document.getElementById('gaugePct').textContent=pct+'%';
+  document.getElementById('gScoreTxt').textContent=score+'점';
+  const badge=document.getElementById('qTypeBadge');
+  if(q.ice){badge.textContent='❄️ 취향 아이스브레이킹';badge.className='q-type-badge ice';}
+  else{badge.textContent='🍝 메뉴 취향';badge.className='q-type-badge';}
+  document.getElementById('qNum').textContent='QUESTION '+String(curQ+1).padStart(2,'0');
+  document.getElementById('qText').textContent=q.text;
+  document.getElementById('choiceA').textContent=q.a;
+  document.getElementById('choiceB').textContent=q.b;
+  const a=document.getElementById('choiceA'),b=document.getElementById('choiceB');
+  a.className='c-btn';b.className='c-btn';
+  if(answers[curQ]==='A')a.className='c-btn sel-a';
+  if(answers[curQ]==='B')b.className='c-btn sel-b';
+  const nxt=document.getElementById('nextBtn');
+  nxt.disabled=!answers[curQ];
+  nxt.textContent=curQ===TOTAL_Q-1?'결과 보기 🎉':'다음 →';
+  document.getElementById('gBackBtn').classList.toggle('dim',curQ===0);
+  const card=document.getElementById('gCard');
+  card.style.animation='none';card.offsetHeight;card.style.animation='fadeUp .3s ease';
+}
+function pickChoice(c){
+  const was=answers[curQ]===null;
+  answers[curQ]=c;
+  if(was)score+=20;
+  document.getElementById('choiceA').className='c-btn'+(c==='A'?' sel-a':'');
+  document.getElementById('choiceB').className='c-btn'+(c==='B'?' sel-b':'');
+  const nxt=document.getElementById('nextBtn');
+  nxt.disabled=false;
+  nxt.textContent=curQ===TOTAL_Q-1?'결과 보기 🎉':'다음 →';
+  const pct=Math.round((score/(TOTAL_Q*20))*100);
+  document.getElementById('gaugeFill').style.width=Math.min(pct,100)+'%';
+  document.getElementById('gaugePct').textContent=pct+'%';
+  document.getElementById('gScoreTxt').textContent=score+'점';
+}
+function prevQ(){if(curQ>0){curQ--;renderQ();}}
+function nextQ(){ if(!answers[curQ])return; if(curQ===TOTAL_Q-1){buildResults();return;} curQ++; renderQ(); }
+
+let swipeX=0;
+document.addEventListener('touchstart',e=>{swipeX=e.touches[0].clientX;},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(!document.getElementById('page-game').classList.contains('active'))return;
+  const dx=swipeX-e.changedTouches[0].clientX;
+  if(Math.abs(dx)>70){if(dx>0&&answers[curQ])nextQ();else if(dx<0)prevQ();}
+},{passive:true});
+
+function buildResults(){
+  showPage('results');
+  const qs=Qs[party];
+  const cnt={K:0,S:0,A:0,U:0,R:0,P:0,I:0,E:0};
+  answers.forEach((ans,i)=>{ const q=qs[i]; if(!ans)return; const pole=ans==='A'?q.axisA:q.axisB; if(pole in cnt)cnt[pole]++; });
+  const a1=cnt.K>=cnt.S?'K':'S';
+  const a2=cnt.A>=cnt.U?'A':'U';
+  const a3=cnt.R>=cnt.P?'R':'P';
+  const a4=cnt.I>=cnt.E?'I':'E';
+  const code=a1+a2+a3+a4;
+  const m=MBTI16[code]||MBTI16.SURI;
+  document.getElementById('mbtiEmoji').textContent=m.emoji;
+  document.getElementById('mbtiType').textContent=code;
+  document.getElementById('mbtiName').textContent=m.name;
+  document.getElementById('mbtiDesc').textContent=m.desc;
+  document.getElementById('mbtiDish').textContent='🍽️ 추천 한 그릇: '+m.dish;
+  document.getElementById('sMbtiEmoji').textContent=m.emoji;
+  document.getElementById('sMbtiType').textContent=code;
+  document.getElementById('sMbtiName').textContent=m.name;
+  document.getElementById('sMbtiDesc').textContent=m.desc;
+  document.getElementById('axisRow').innerHTML=[a1,a2,a3,a4].map(l=>`<span class="axis-chip"><b>${l}</b> ${AXIS_KR[l]}</span>`).join('');
+  const list=document.getElementById('ansList');
+  list.innerHTML='';
+  answers.forEach((ans,i)=>{
+    const q=qs[i],chosen=(ans==='A'?q.a:q.b).replace(/\n/g,' ');
+    const div=document.createElement('div');
+    div.className='ans-item';
+    div.innerHTML=`<div class="ans-num">${i+1}</div><div class="ans-txt">${chosen}</div>`;
+    list.appendChild(div);
+  });
+  const set=recommendSet({a1,a2,a3,a4},party);
+  document.getElementById('recName').textContent=set.name;
+  document.getElementById('recItems').innerHTML=set.items.replace(/\n/g,'<br>');
+  document.getElementById('recPrice').textContent=set.price;
+  const upEl=document.getElementById('recUpgrade');
+  upEl.textContent=set.upgrade; upEl.style.display=set.upgrade?'':'none';
+  /* 향후 사장님 통계용으로 응답을 조용히 저장 (UI 없음, 미리보기에서만 작동) */
+  const ansDetail=answers.map((a,i)=>({q:qs[i].text,c:(a==='A'?qs[i].a:qs[i].b).replace(/\n/g,' ')}));
+  recordSession(party,code,set.name,ansDetail);
+}
+
+/* ===== 룰렛 (J's PLATE 메뉴 기반 쿠폰) ===== */
+const REWARDS=[
+  {emoji:'🥤',name:'음료 무료',desc:'콜라/사이다 1잔 무료',color:'#4FC3F7',prob:.28},
+  {emoji:'🍝',name:'면 추가 무료',desc:'파스타 면 사리 추가 무료',color:'#81C784',prob:.24},
+  {emoji:'🍫',name:'퐁당쇼콜라 무료',desc:'시그니처 디저트 1개 무료',color:'#FF8A65',prob:.16},
+  {emoji:'🍕',name:'피자 1,000원 할인',desc:'피자 메뉴 1,000원 할인',color:'#FFD54F',prob:.16},
+  {emoji:'🍺',name:'버드와이저 무료',desc:'버드와이저 1병 무료',color:'#CE93D8',prob:.10},
+  {emoji:'🎁',name:'2,000원 할인',desc:'전 메뉴 2,000원 할인',color:'#F48FB1',prob:.06}
+];
+
+function initRoulette(){
+  drawWheel(rouAngle);
+  const btn=document.getElementById('spinBtn');
+  if(spun){ btn.disabled=true; btn.textContent='✅ 이미 룰렛을 돌렸어요'; document.getElementById('postBtns').style.display='flex'; }
+  else{ btn.disabled=false; btn.textContent='✨ 룰렛 돌리기'; document.getElementById('cpnResult').classList.remove('show'); document.getElementById('postBtns').style.display='none'; }
+}
+function drawWheel(angle){
+  const canvas=document.getElementById('rouCanvas');
+  const ctx=canvas.getContext('2d');
+  const cx=150,cy=150,r=147;
+  ctx.clearRect(0,0,300,300);
+  const n=REWARDS.length,arc=(Math.PI*2)/n;
+  REWARDS.forEach((rw,i)=>{
+    const s=angle+i*arc,e=s+arc;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,s,e);ctx.closePath();
+    ctx.fillStyle=rw.color;ctx.fill();
+    ctx.strokeStyle='rgba(0,0,0,.18)';ctx.lineWidth=2;ctx.stroke();
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(s+arc/2);
+    ctx.textBaseline='middle';ctx.textAlign='center';
+    const lx=r*0.62;
+    ctx.font='16px serif';ctx.fillText(rw.emoji,lx,-9);
+    ctx.font='bold 8.5px Apple SD Gothic Neo,sans-serif';
+    ctx.fillStyle='rgba(0,0,0,.85)';ctx.fillText(rw.name,lx,9,82);
+    ctx.restore();
+  });
+  ctx.beginPath();ctx.arc(cx,cy,22,0,Math.PI*2);
+  ctx.fillStyle='#0D0D18';ctx.fill();
+  ctx.strokeStyle='rgba(255,244,79,.6)';ctx.lineWidth=3;ctx.stroke();
+  ctx.fillStyle='#FFF44F';ctx.font='bold 12px sans-serif';
+  ctx.textAlign='center';ctx.fillText('GO!',cx,cy+4);
+}
+function doSpin(){
+  if(rouAnim||spun)return;
+  rouAnim=true;
+  const btn=document.getElementById('spinBtn');
+  btn.disabled=true;btn.textContent='🎰 돌리는 중...';
+  let rand=Math.random(),cum=0,winner=0;
+  for(let i=0;i<REWARDS.length;i++){cum+=REWARDS[i].prob;if(rand<=cum){winner=i;break;}}
+  const n=REWARDS.length,arc=(Math.PI*2)/n,spins=5+Math.floor(Math.random()*4);
+  const targetBase=-Math.PI/2-winner*arc-arc/2;
+  const totalRot=spins*(Math.PI*2)+((targetBase-rouAngle)%(Math.PI*2)+Math.PI*2)%(Math.PI*2);
+  const start=rouAngle,dur=4500,t0=performance.now();
+  (function frame(now){
+    const p=Math.min((now-t0)/dur,1);
+    const e=1-Math.pow(1-p,4);
+    rouAngle=start+totalRot*e;
+    drawWheel(rouAngle);
+    if(p<1){requestAnimationFrame(frame);}
+    else{rouAnim=false;spun=true;revealCoupon(winner);}
+  })(performance.now());
+}
+function revealCoupon(idx){
+  const rw=REWARDS[idx];
+  document.getElementById('cpnEmoji').textContent=rw.emoji;
+  document.getElementById('cpnName').textContent=rw.name;
+  document.getElementById('cpnDesc').textContent=rw.desc+' — 사장님께 이 화면을 보여주세요!';
+  const bnum='8809'+Math.floor(Math.random()*1e9).toString().padStart(9,'0');
+  document.getElementById('bcNum').textContent=bnum;
+  const lines=document.getElementById('bcLines');
+  lines.innerHTML='';
+  for(let i=0;i<58;i++){ const d=document.createElement('div');d.className='b-line'; const w=Math.random()>.65?3:Math.random()>.5?2:1; d.style.width=w+'px';lines.appendChild(d); }
+  const today=new Date();
+  document.getElementById('cpnExp').textContent='유효기간: '+`${today.getMonth()+1}월 ${today.getDate()}일 영업 종료까지`;
+  document.getElementById('cpnResult').classList.add('show');
+  coupons.push({...rw,bnum,exp:`${today.getMonth()+1}월 ${today.getDate()}일 영업 종료까지`,date:today.toLocaleDateString('ko-KR')});
+  document.getElementById('wBadge').textContent=coupons.length;
+  renderWallet();
+  document.getElementById('postBtns').style.display='flex';
+  document.getElementById('spinBtn').textContent='✅ 이미 룰렛을 돌렸어요';
+  showToast('🎉 '+rw.name+' 당첨!');
+}
+function renderWallet(){
+  const el=document.getElementById('walletList');
+  if(coupons.length===0){ el.innerHTML=`<div class="w-empty"><div class="w-empty-ico">🎫</div><div style="font-size:16px;font-weight:700;margin-bottom:6px;">쿠폰이 없어요</div><div style="font-size:14px;">밸런스 게임 완료 후 룰렛을 돌려보세요!</div></div>`; return; }
+  el.innerHTML='';
+  coupons.forEach(c=>{
+    let lines='';
+    for(let i=0;i<58;i++){const w=Math.random()>.65?3:Math.random()>.5?2:1;lines+=`<div class="b-line" style="width:${w}px;"></div>`;}
+    const div=document.createElement('div');
+    div.className='w-cpn-card';
+    div.innerHTML=`<div class="w-cpn-top"><div class="w-cpn-name">${c.emoji} ${c.name}</div><div class="w-cpn-badge">사용가능</div></div><div class="w-cpn-desc">${c.desc}</div><div class="w-barcode"><div class="barcode-lines">${lines}</div><div class="barcode-num">${c.bnum}</div></div><div class="w-cpn-exp">유효기간: ${c.exp} · 획득: ${c.date}</div>`;
+    el.appendChild(div);
+  });
+}
+
+function filterMenu(type,btn){
+  document.querySelectorAll('.m-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  ['set','sr','pasta','pizza','drink'].forEach(s=>{ const el=document.getElementById('ms-'+s); if(el)el.style.display=(type==='all'||type===s)?'block':'none'; });
+}
+
+function openShare(){document.getElementById('shareModal').classList.add('open');}
+function closeShare(e){if(!e||e.target===document.getElementById('shareModal'))document.getElementById('shareModal').classList.remove('open');}
+function copyLink(){ navigator.clipboard.writeText(location.href).then(()=>{showToast('🔗 링크가 복사되었어요!');closeShare();}).catch(()=>{showToast('🔗 링크 복사 완료');closeShare();}); }
+function toastShare(p){showToast(`📤 ${p} 공유 준비 중...`);closeShare();}
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); }
+
+/* 향후 사장님 통계 연동을 위해 응답을 조용히 저장 (UI 없음) */
+async function recordSession(p,mbtiType,setName,ans){
+  if(!window.storage)return;
+  try{ const key='session:'+Date.now()+'_'+Math.random().toString(36).slice(2,7); await window.storage.set(key,JSON.stringify({party:p,mbtiType,setName,ans,ts:Date.now()}),true); }catch(e){}
+}
+
+renderWallet();
+</script>
+</body>
+</html>
