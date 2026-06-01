@@ -211,6 +211,35 @@ body {
 .s-opt-ico { width:48px; height:48px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:22px; }
 .s-opt-lbl { font-size:11px; color:var(--text-muted); }
 .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%); background:rgba(28,28,42,.96); border:1px solid var(--border); color:var(--text); padding:11px 20px; border-radius:12px; font-size:14px; font-weight:600; z-index:400; display:none; white-space:nowrap; backdrop-filter:blur(10px); }
+.spinner { width:64px; height:64px; border-radius:50%; border:5px solid var(--bg3); border-top-color:var(--primary); animation:spin .8s linear infinite; margin-bottom:24px; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.load-title { font-size:22px; font-weight:900; letter-spacing:-.5px; }
+.load-sub { font-size:14px; color:var(--text-muted); margin-top:8px; }
+.load-prog { width:200px; height:6px; background:var(--bg3); border-radius:99px; overflow:hidden; margin:22px 0 0; }
+.load-prog-fill { width:0%; height:100%; background:linear-gradient(90deg,var(--primary-dark),var(--primary)); border-radius:99px; }
+.load-prog-fill.run { width:100%; transition:width 5s linear; }
+.ad-banner { display:flex; align-items:center; gap:13px; width:100%; max-width:360px; margin-top:40px; padding:15px 16px; background:linear-gradient(135deg,#2a2410,#3d3416); border:1px solid var(--border); border-radius:18px; text-decoration:none; position:relative; overflow:hidden; box-shadow:0 8px 28px rgba(255,244,79,.12); animation:adIn .5s ease; }
+@keyframes adIn { from{opacity:0;transform:translateY(12px);} to{opacity:1;transform:translateY(0);} }
+.ad-tag { position:absolute; top:8px; right:10px; font-size:9px; font-weight:800; color:rgba(255,244,79,.6); border:1px solid rgba(255,244,79,.3); border-radius:5px; padding:1px 5px; letter-spacing:.5px; }
+.ad-ico { font-size:34px; flex-shrink:0; }
+.ad-txt { flex:1; }
+.ad-main { font-size:15px; font-weight:800; color:var(--primary); letter-spacing:-.3px; }
+.ad-sub { font-size:11px; color:rgba(240,240,248,.7); margin-top:3px; }
+.ad-arrow { font-size:24px; color:rgba(255,244,79,.55); flex-shrink:0; }
+.adm-stat-row{display:flex;gap:10px;margin-bottom:18px;}
+.adm-stat{flex:1;background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:16px 12px;text-align:center;}
+.adm-stat-num{font-size:26px;font-weight:900;color:var(--primary);}
+.adm-stat-lbl{font-size:11px;color:var(--text-muted);margin-top:3px;}
+.adm-card{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:16px 16px 14px;margin-bottom:14px;}
+.adm-card-title{font-size:13px;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+.adm-row{margin-bottom:12px;}
+.adm-row:last-child{margin-bottom:0;}
+.adm-row-top{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;gap:8px;}
+.adm-row-top span:first-child{flex:1;}
+.adm-cnt{color:var(--text-muted);font-size:12px;font-weight:600;white-space:nowrap;}
+.adm-bar-bg{height:7px;background:var(--bg);border-radius:99px;overflow:hidden;}
+.adm-bar{height:100%;background:linear-gradient(90deg,var(--primary-dark),var(--primary));border-radius:99px;}
+.adm-q-title{font-size:12px;font-weight:700;color:var(--text);margin:14px 0 10px;padding-top:12px;border-top:1px solid rgba(255,255,255,.05);}
 .toast.show { display:block; animation:toastIn .3s ease; }
 @keyframes toastIn { from { transform:translateX(-50%) translateY(16px); opacity:0; } to { transform:translateX(-50%) translateY(0); opacity:1; } }
 </style>
@@ -218,7 +247,7 @@ body {
 <body>
 <div class="app">
 <div class="hdr">
-  <div class="hdr-logo">🍝 EagerTing</div>
+  <div class="hdr-logo" onclick="logoTap()" style="cursor:pointer;">🍝 EagerTing</div>
   <button class="hdr-wallet" onclick="goWallet()">🎫 쿠폰 <span class="w-badge" id="wBadge">0</span></button>
 </div>
 
@@ -248,6 +277,7 @@ body {
       <div class="p-card" onclick="selectParty('friends',this)"><span class="p-icon">👥</span><div class="p-name">친구</div><div class="p-desc">신나는 만남</div></div>
       <div class="p-card" onclick="selectParty('work',this)"><span class="p-icon">🥂</span><div class="p-name">회식</div><div class="p-desc">즐거운 팀 저녁</div></div>
       <div class="p-card" onclick="selectParty('family',this)"><span class="p-icon">👨‍👩‍👧</span><div class="p-name">가족</div><div class="p-desc">따뜻한 가족 식사</div></div>
+      <div class="p-card" onclick="selectParty('solo',this)" style="grid-column:1/-1;"><span class="p-icon">🧘</span><div class="p-name">혼밥</div><div class="p-desc">나를 위한 한 끼</div></div>
     </div>
     <button class="btn-y" id="startBtn" onclick="startGame()" disabled style="opacity:.35;">🎮 밸런스 게임 시작!</button>
     <button class="btn-ghost" onclick="showPage('menu')" style="margin-top:10px;">🍽️ 건너뛰고 메뉴 보기</button>
@@ -281,6 +311,25 @@ body {
       <button class="nav-prev" onclick="prevQ()">←</button>
       <button class="nav-next" id="nextBtn" onclick="nextQ()" disabled>다음 →</button>
     </div>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div class="page" id="page-loading">
+  <div class="inner" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 62px);padding:24px;">
+    <div class="spinner"></div>
+    <div class="load-title">취향 분석 중<span id="loadDots">...</span></div>
+    <div class="load-sub">당신의 입맛 MBTI를 찾고 있어요</div>
+    <div class="load-prog"><div class="load-prog-fill" id="loadProgFill"></div></div>
+    <a class="ad-banner" href="https://www.instagram.com/eagerting_official?igsh=MW1oY3VwcWQybG04bQ==" target="_blank" rel="noopener">
+      <div class="ad-tag">AD</div>
+      <div class="ad-ico">⚡</div>
+      <div class="ad-txt">
+        <div class="ad-main">웨이팅이 설레이는 시간으로, 이거팅</div>
+        <div class="ad-sub">📷 @eagerting_official · 인스타 보러가기</div>
+      </div>
+      <div class="ad-arrow">›</div>
+    </a>
   </div>
 </div>
 
@@ -329,6 +378,20 @@ body {
       <button class="btn-ghost" onclick="goWallet()">🎫 쿠폰 보관함</button>
       <button class="btn-y" onclick="showPage('home')">🏠 홈으로</button>
     </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="page" id="page-admin">
+  <div class="inner" style="padding:22px 18px 48px;">
+    <button class="back-btn" onclick="showPage('home')">← 뒤로</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <div style="font-size:22px;font-weight:900;">📊 사장님 통계</div>
+      <button class="hdr-wallet" onclick="renderAdmin()">🔄 새로고침</button>
+    </div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">손님들이 무엇을 골랐는지 한눈에 확인하세요</div>
+    <div id="adminBody"></div>
+    <button class="btn-ghost" id="resetBtn" onclick="resetAdmin()" style="margin-top:8px;">🗑️ 통계 데이터 초기화</button>
   </div>
 </div>
 
@@ -502,6 +565,15 @@ const Qs={
     {ice:true,text:'가족이 즐기는 맛은?',a:'🌶️ 입맛 확 도는\n진한 맛',b:'🍚 부담 없는\n담백한 맛',axisA:'K',axisB:'S'},
     {ice:false,text:'음료는?',a:'🥝 새로운 스무디·\n에이드 시도',b:'🥤 늘 마시던\n콜라·주스',axisA:'A',axisB:'U'},
     {ice:true,text:'가족 외식 사진은?',a:'😋 먹느라\n바빠',b:'📷 다 같이\n한 컷 남기기',axisA:'R',axisB:'P'}
+  ],
+  solo:[
+    {ice:false,text:'오늘 나에게 주고 싶은 맛은?',a:'🌶️ 진하고 자극적인\n크림·매콤',b:'🫒 담백하고 산뜻한\n오일·토마토',axisA:'K',axisB:'S'},
+    {ice:true,text:'혼밥 메뉴 고를 때 나는?',a:'🆕 새 메뉴\n(카레크림·나가사키) 도전',b:'😌 늘 먹던\n안전한 메뉴',axisA:'A',axisB:'U'},
+    {ice:false,text:'혼밥할 때 더 중요한 건?',a:'🍝 양 많고 든든한\n가성비',b:'🍕 예쁘고 분위기\n나는 비주얼',axisA:'R',axisB:'P'},
+    {ice:false,text:'1인분이면 충분?',a:'🍽️ 딱 1인 세트\n나 혼자 집중',b:'🥢 좀 넉넉히 시켜\n남으면 포장',axisA:'I',axisB:'E'},
+    {ice:true,text:'기분 전환이 필요한 날엔?',a:'🌶️ 매콤한 불닭·\n할라피뇨로 자극',b:'🍚 속 편한\n담백한 한 그릇',axisA:'K',axisB:'S'},
+    {ice:false,text:'혼밥 음료는?',a:'🥝 새로운 스무디·\n에이드 도전',b:'☕ 늘 마시던\n아메리카노·콜라',axisA:'A',axisB:'U'},
+    {ice:true,text:'혼밥 인증샷은?',a:'😋 그냥 맛있게\n먹기 바빠',b:'📷 예쁘게 한 컷\n남기는 편',axisA:'R',axisB:'P'}
   ]
 };
 
@@ -527,10 +599,10 @@ const MBTI16={
   SUPI:{name:'깔끔 혼밥러',emoji:'🍱',desc:'깔끔한 클래식 메뉴를 1인 상으로 온전히 즐기는 타입',dish:'마르게리따 피자',good:'SURI 뚝심 담백파',bad:'KAPE 핫플 비주얼러'}
 };
 
-const PARTY_KR={couple:'💕 커플',friends:'👥 친구',work:'🥂 회식',family:'👨‍👩‍👧 가족'};
+const PARTY_KR={couple:'💕 커플',friends:'👥 친구',work:'🥂 회식',family:'👨‍👩‍👧 가족',solo:'🧘 혼밥'};
 
 function recommendSet(L,party){
-  const share=L.a4==='E';
+  const share = L.a4==='E' && party!=='solo';
   let pasta;
   if(L.a1==='K'){ pasta = L.a2==='A' ? '불닭 까르보나라 또는 카레크림 리조또' : '까르보나라 (크림 클래식)'; }
   else { pasta = L.a2==='A' ? '우삼겹 할라피뇨 오일 또는 카레 토마토' : '뽀모도로 또는 엔초비 루꼴라 오일'; }
@@ -600,14 +672,28 @@ function pickChoice(c){
   document.getElementById('gScoreTxt').textContent=score+'점';
 }
 function prevQ(){if(curQ>0){curQ--;renderQ();}}
-function nextQ(){ if(!answers[curQ])return; if(curQ===TOTAL_Q-1){buildResults();return;} curQ++; renderQ(); }
+function nextQ(){ if(!answers[curQ])return; if(curQ===TOTAL_Q-1){startLoading();return;} curQ++; renderQ(); }
+
+let loadDotTimer=null;
+function startLoading(){
+  showPage('loading');
+  const fill=document.getElementById('loadProgFill');
+  fill.classList.remove('run'); fill.style.width='0%';
+  void fill.offsetWidth;
+  fill.classList.add('run');
+  let d=0;
+  const dotsEl=document.getElementById('loadDots');
+  clearInterval(loadDotTimer);
+  loadDotTimer=setInterval(()=>{ d=(d+1)%4; dotsEl.textContent='.'.repeat(d); },400);
+  setTimeout(()=>{ clearInterval(loadDotTimer); buildResults(); }, 5000);
+}
 
 let swipeX=0;
 document.addEventListener('touchstart',e=>{swipeX=e.touches[0].clientX;},{passive:true});
 document.addEventListener('touchend',e=>{
   if(!document.getElementById('page-game').classList.contains('active'))return;
   const dx=swipeX-e.changedTouches[0].clientX;
-  if(Math.abs(dx)>70){if(dx>0&&answers[curQ])nextQ();else if(dx<0)prevQ();}
+  if(Math.abs(dx)>70){if(dx>0&&answers[curQ]){if(curQ===TOTAL_Q-1)startLoading();else nextQ();}else if(dx<0)prevQ();}
 },{passive:true});
 
 function buildResults(){
@@ -775,6 +861,147 @@ function showToast(msg){ const t=document.getElementById('toast'); t.textContent
 async function recordSession(p,mbtiType,setName,ans){
   if(!window.storage)return;
   try{ const key='session:'+Date.now()+'_'+Math.random().toString(36).slice(2,7); await window.storage.set(key,JSON.stringify({party:p,mbtiType,setName,ans,ts:Date.now()}),true); }catch(e){}
+}
+
+/* ===== 사장님 통계 (로고 3번 탭으로 진입) ===== */
+let logoTaps=0,logoTimer=null;
+function logoTap(){ logoTaps++; clearTimeout(logoTimer); logoTimer=setTimeout(()=>logoTaps=0,1500); if(logoTaps>=3){ logoTaps=0; showPage('admin'); renderAdmin(); } }
+
+async function loadSessions(){
+  let sessions=[];
+  if(!window.storage)return sessions;
+  try{
+    const res=await window.storage.list('session:',true);
+    const keys=(res&&res.keys)||[];
+    for(const item of keys){
+      const k=typeof item==='string'?item:(item.key||item.name);
+      if(!k)continue;
+      try{const g=await window.storage.get(k,true);if(g&&g.value)sessions.push(JSON.parse(g.value));}catch(e){}
+    }
+  }catch(e){}
+  return sessions;
+}
+
+function admBar(title,mapObj){
+  const entries=Object.entries(mapObj).sort((a,b)=>b[1]-a[1]);
+  const total=entries.reduce((s,e)=>s+e[1],0)||1;
+  let h=`<div class="adm-card"><div class="adm-card-title">${title}</div>`;
+  if(!entries.length)h+='<div style="color:var(--text-muted);font-size:13px;">아직 데이터가 없어요</div>';
+  entries.forEach(([k,v])=>{const pct=Math.round(v/total*100);h+=`<div class="adm-row"><div class="adm-row-top"><span>${k}</span><span class="adm-cnt">${v}명 · ${pct}%</span></div><div class="adm-bar-bg"><div class="adm-bar" style="width:${pct}%"></div></div></div>`;});
+  return h+'</div>';
+}
+
+async function renderAdmin(){
+  const wrap=document.getElementById('adminBody');
+  wrap.innerHTML='<div style="text-align:center;padding:40px;color:var(--text-muted);">불러오는 중...</div>';
+  const sessions=await loadSessions();
+  if(!window.storage){
+    wrap.innerHTML='<div class="adm-card" style="color:var(--text-muted);font-size:13px;line-height:1.6;">이 환경에서는 공유 저장소를 사용할 수 없어요.<br>Claude 앱 미리보기에서는 정상 작동하며, 외부 배포 사이트에서는 별도 서버(DB)가 필요합니다.</div>';
+    return;
+  }
+  if(!sessions.length){
+    wrap.innerHTML='<div class="adm-card" style="text-align:center;color:var(--text-muted);padding:36px 16px;"><div style="font-size:40px;margin-bottom:10px;">📭</div><div style="font-weight:700;font-size:15px;margin-bottom:5px;color:var(--text);">아직 참여 기록이 없어요</div><div style="font-size:13px;">손님이 밸런스 게임을 완료하면<br>여기에 통계가 쌓여요!</div></div><button class="btn-ghost" onclick="addTestData()" style="font-size:13px;">🧪 테스트 데이터 1건 추가</button>';
+    return;
+  }
+  const partyC={},mbtiC={},sauceC={},timeC={lunch:0,dinner:0,weekend:0},qMap={};
+  const SAUCE=[['크림','크림|까르보나라|베이컨'],['토마토','토마토|뽀모도로'],['오일','오일|엔초비|할라피뇨'],['로제','로제'],['리조또','리조또']];
+  sessions.forEach(s=>{
+    const pk=PARTY_KR[s.party]||s.party;
+    partyC[pk]=(partyC[pk]||0)+1;
+    if(s.mbtiType){const nm=MBTI16[s.mbtiType]?(s.mbtiType+' '+MBTI16[s.mbtiType].name):s.mbtiType;mbtiC[nm]=(mbtiC[nm]||0)+1;}
+    // 시간대 (저장된 timestamp 기준)
+    if(s.ts){const d=new Date(s.ts);const day=d.getDay();const h=d.getHours();if(day===0||day===6)timeC.weekend++;else if(h>=11&&h<15)timeC.lunch++;else timeC.dinner++;}
+    // 소스 취향 (선택한 답안 텍스트에서 추출)
+    (s.ans||[]).forEach(a=>{
+      if(!a||!a.c)return;
+      SAUCE.forEach(([name,re])=>{ if(new RegExp(re).test(a.c)) sauceC[name]=(sauceC[name]||0)+1; });
+    });
+    (s.ans||[]).forEach(a=>{if(!a||!a.q)return;qMap[a.q]=qMap[a.q]||{};qMap[a.q][a.c]=(qMap[a.q][a.c]||0)+1;});
+  });
+
+  let html='';
+  html+=`<div class="adm-stat-row"><div class="adm-stat"><div class="adm-stat-num">${sessions.length}</div><div class="adm-stat-lbl">총 참여 수</div></div><div class="adm-stat"><div class="adm-stat-num">${Object.keys(mbtiC).length}</div><div class="adm-stat-lbl">나온 입맛 유형</div></div></div>`;
+
+  // 1. 고객 취향 데이터 (실데이터)
+  html+=admBar('1️⃣ 고객 취향 데이터 (소스 선호)',sauceC)
+      + admUse('잘 안 팔리는 메뉴 정리 · 신메뉴 개발 방향 · 재료 발주량 조절');
+
+  // 3. 방문 고객 유형 (실데이터)
+  html+=admBar('3️⃣ 방문 고객 유형',partyC)
+      + admUse('매장 구성 · 세트메뉴 구성 · 프로모션 기획');
+
+  // 4. 시간대별 고객 (실데이터: timestamp)
+  const timeMap={'🌤️ 점심(11~15시)':timeC.lunch,'🌙 저녁':timeC.dinner,'📅 주말':timeC.weekend};
+  html+=admBar('4️⃣ 시간대별 방문',timeMap)
+      + admUse('시간대별 할인 · 인력 배치');
+
+  // 5. MBTI 분포 (실데이터)
+  html+=admBar('5️⃣ 입맛 MBTI 분포',mbtiC)
+      + admUse('고객 성향 파악 · 맞춤 이벤트 · "우리 손님이 어떤 음식을 좋아하는가"가 핵심');
+
+  // ===== 아래는 예시(데모) 데이터: POS·회원·웨이팅 연동 시 실데이터로 전환 =====
+  html+='<div style="font-size:12px;color:var(--text-muted);margin:22px 0 10px;padding-left:2px;">📌 아래 항목은 POS·웨이팅·회원 연동 시 실데이터로 채워집니다 (현재 예시)</div>';
+
+  // 2. 인기 메뉴 예측 (게임 추천 vs 실제 주문 - 예시)
+  html+=admDemoTable('2️⃣ 인기 메뉴 예측 (추천 vs 실제 주문)',[['까르보나라','65%'],['마르게리따','20%'],['로제 파스타','15%']])
+      + admUse('추천 알고리즘 개선 · 판매량 예측');
+
+  // 6. 쿠폰 효과 (예시)
+  html+=admDemoTable('6️⃣ 쿠폰 효과 분석 (사용률)',[['음료 무료','82%'],['디저트 제공','67%'],['10% 할인','45%']])
+      + admUse('가장 효과적인 이벤트 선정');
+
+  // 7. 재방문율 (예시)
+  html+=admDemoTable('7️⃣ 재방문율',[['쿠폰 받은 고객','37%'],['일반 고객','18%']])
+      + admUse('마케팅 ROI 측정');
+
+  // 8. 웨이팅 이탈률 (예시)
+  html+=admDemoTable('8️⃣ 웨이팅 이탈률 (등록 100명)',[['입장 완료','83명'],['취소','17명']])
+      + admUse('적정 대기시간 계산 · 운영 개선');
+
+  wrap.innerHTML=html;
+}
+
+function admUse(txt){ return `<div style="font-size:11px;color:var(--text-muted);margin:-6px 0 16px;padding:9px 12px;background:rgba(255,255,255,.03);border-radius:10px;line-height:1.5;">💡 활용: ${txt}</div>`; }
+
+function admDemoTable(title,rows){
+  let h=`<div class="adm-card" style="border-style:dashed;"><div class="adm-card-title">${title} <span style="font-size:10px;color:var(--text-muted);border:1px solid rgba(255,255,255,.2);border-radius:5px;padding:1px 5px;margin-left:auto;">예시</span></div>`;
+  rows.forEach(([k,v])=>{ h+=`<div class="adm-row-top" style="margin-bottom:9px;"><span style="font-size:13px;">${k}</span><span style="font-weight:800;color:var(--primary);">${v}</span></div>`; });
+  return h+'</div>';
+}
+
+async function addTestData(){
+  const parties=['couple','friends','work','family'];
+  const codes=Object.keys(MBTI16);
+  const p=parties[Math.floor(Math.random()*parties.length)];
+  const code=codes[Math.floor(Math.random()*codes.length)];
+  const qs=Qs[p];
+  const ans=qs.map(q=>{const useA=Math.random()>.5;return {q:q.text,c:(useA?q.a:q.b).replace(/\n/g,' ')};});
+  await recordSession(p,code,'1인 세트',ans);
+  showToast('🧪 테스트 데이터 추가됨');
+  renderAdmin();
+}
+
+let resetArmed=false,resetTimer=null;
+function resetBtnReset(){ resetArmed=false; clearTimeout(resetTimer); const btn=document.getElementById('resetBtn'); if(btn){btn.textContent='🗑️ 통계 데이터 초기화';btn.style.color='';btn.style.borderColor='';} }
+async function resetAdmin(){
+  const btn=document.getElementById('resetBtn');
+  if(!resetArmed){
+    resetArmed=true;
+    if(btn){btn.textContent='⚠️ 정말 삭제하려면 한 번 더 누르세요';btn.style.color='#FF6464';btn.style.borderColor='rgba(255,100,100,.4)';}
+    clearTimeout(resetTimer); resetTimer=setTimeout(resetBtnReset,3000);
+    return;
+  }
+  resetArmed=false; clearTimeout(resetTimer);
+  if(btn)btn.textContent='삭제 중...';
+  if(!window.storage){showToast('❌ 저장소 사용 불가');resetBtnReset();return;}
+  let deleted=0;
+  try{
+    const res=await window.storage.list('session:',true);
+    const keys=(res&&res.keys)||[];
+    for(const item of keys){ const k=typeof item==='string'?item:(item.key||item.name); if(k){try{await window.storage.delete(k,true);deleted++;}catch(e){}} }
+  }catch(e){}
+  showToast('🗑️ '+deleted+'건 삭제 완료');
+  resetBtnReset(); renderAdmin();
 }
 
 renderWallet();
